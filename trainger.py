@@ -659,7 +659,7 @@ Trainger terminal. Commands:
 				
 				self.sound_proc.start_morse_playback(response)
 				# also print the word and its encoding
-				print("Input:\t", response)
+				print("Input:\t\t", response)
 				print("Encoding:\t", raw_ttm_out)
 		
 		return False
