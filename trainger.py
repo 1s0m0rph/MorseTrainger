@@ -397,7 +397,7 @@ class Trainer:
 		"""
 		if the audio is done, start the timer
 		"""
-		if (0 == self.this_q_start_time) and (not self.sound_proc.playing_sound()):
+		if (0 == self.this_q_start_time) and (not self.sound_proc.playing_sound()) and (self.quiz_active):
 			self.this_q_start_time = time()
 			
 	
@@ -421,8 +421,6 @@ class Trainer:
 			print("Your answer:    ", user_ans)
 			print("Answered in {:.2f} s".format(time() - self.this_q_start_time))
 			self.num_incorrect += 1
-		
-		self.this_q_start_time = 0
 		
 		print("Stats so far: {}/{} ({:.2f}%)".format(self.num_correct,
 		                                             self.num_correct+self.num_incorrect,
