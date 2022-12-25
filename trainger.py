@@ -419,7 +419,10 @@ class Trainer:
 		else:
 			print("Correct answer: ", self.current_ans)
 			print("Your answer:    ", user_ans)
+			print("Answered in {:.2f} s".format(time() - self.this_q_start_time))
 			self.num_incorrect += 1
+		
+		self.this_q_start_time = 0
 		
 		print("Stats so far: {}/{} ({:.2f}%)".format(self.num_correct,
 		                                             self.num_correct+self.num_incorrect,
