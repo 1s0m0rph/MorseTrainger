@@ -6,6 +6,7 @@ import numpy as np
 from time import sleep, time
 from numpy.random import normal
 from os.path import isfile
+from sys import argv
 
 DEFAULT_SAM_RATE_HZ = 11025
 EXEC_FREQ_HZ = 500
@@ -670,9 +671,7 @@ class Controller:
 	handle cycling and dispatching
 	"""
 	
-	def __init__(self):
-		#TODO file input (and output) for settings
-		
+	def __init__(self, setup_file_path):
 		# objects
 		self.sound_proc = SoundProc()
 		self.trainer = Trainer(self.sound_proc)
@@ -680,6 +679,11 @@ class Controller:
 		
 		# internal variables
 		self.cycle_start_time = 0
+		
+		# read file if it was given
+		if setup_file_path is not None and isfile(setup_file_path):
+			# just make the parser do it when we start up
+			self.parser.check_term_input("/read_cmds " + setup_file_path)
 	
 	def exec_one_cycle(self):
 	
@@ -702,7 +706,12 @@ class Controller:
 
 # main exec logic
 print("Welcome to the morse Trainger! Enter terminal input (commands are preceeded by '/') to proceed.")
-ctrl = Controller()
+init_setup_filep = None
+if len(argv) > 1:
+	init_setup_filep = argv[1]
+else:
+	print("Tip: give the path to a commands file as an argument to this script to load it automatically!")
+ctrl = Controller(init_setup_filep)
 while True:
 	if ctrl.exec_one_cycle():
 		print("terminating")
