@@ -3,4 +3,5 @@
 /set_farn_wpm 15
 /disallow_chars .,:?/'"()@+-=
 /disallow_chars 0123456789
-test
+/set_avg_wordlen 3
+/set_wordlen_sig 0

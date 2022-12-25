@@ -167,6 +167,7 @@ def text_to_morse(unencoded_str):
 	for i,ch in enumerate(unencoded_str):
 		if ch not in MORSE_ENCS:
 			print("ERROR, character not known to the encoder: ",ch)
+			return None
 		else:
 			enc_str.append(MORSE_ENCS[ch])
 			if i != len(unencoded_str) - 1:
@@ -288,7 +289,11 @@ class SoundProc:
 				self.delay_timer = None
 		
 		# set up for starting a new sound
-		self.current_text = list(text_to_morse(text))
+		ttm_rawout = text_to_morse(text)
+		if ttm_rawout is None:
+			return # don't do anything
+		
+		self.current_text = list(ttm_rawout)
 		self.current_key_unitlen = 60 / (ASSUME_AVG_WORDLEN_UNITS * self.output_key_wpm)
 		self.current_farn_unitlen = 60 / (ASSUME_AVG_WORDLEN_UNITS * self.output_farn_wpm)
 		
@@ -642,11 +647,16 @@ Trainger terminal. Commands:
 				# assume the user wants this bleeped at them (but compress leading double slashes if we have them)
 				if (len(response) >= 2) and ('/' == response[0]) and ('/' == response[1]):
 					response = '/' + response[2:]
-					
+				
+				# get encoding first
+				raw_ttm_out = text_to_morse(response)
+				if raw_ttm_out is None:
+					return False # can't do anything
+				
 				self.sound_proc.start_morse_playback(response)
 				# also print the word and its encoding
 				print("Input:\t", response)
-				print("Encoding:\t", text_to_morse(response))
+				print("Encoding:\t", raw_ttm_out)
 		
 		return False
 	
