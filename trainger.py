@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import random
 import simpleaudio as sa
 import numpy as np
