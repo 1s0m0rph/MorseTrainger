@@ -5,7 +5,7 @@ from time import sleep, time
 from numpy.random import normal
 from os.path import isfile
 
-DEFAULT_SAM_RATE_HZ = 8000
+DEFAULT_SAM_RATE_HZ = 11025
 EXEC_FREQ_HZ = 500
 DEFAULT_TONE_FREQ_HZ = 600
 DEFAULT_FADE_PCT = 5
@@ -15,6 +15,20 @@ DEFAULT_KEY_WPM = 20
 DEFAULT_FARN_WPM = 20
 DEFAULT_AVG_WORDLEN = 5 # characters
 DEFAULT_WORDLEN_SIG = 2 # characters (stdev)
+
+ALLOWED_AUDIO_SAM_RATES = {
+8000,
+11025,
+16000,
+22050,
+24000,
+32000,
+44100,
+48000,
+88200,
+96000,
+192000
+}
 
 MORSE_ENCS = {
 'A':'.-',
@@ -540,14 +554,23 @@ Trainger terminal. Commands:
 				elif 'set_tone_freq' == cmd[0]:
 					if numerical_2nd(cmd):
 						cmd[1] = tryparse(cmd[1])
+						if cmd[1] > self.sound_proc.sam_rate_hz / 2:
+							print("WARNING: selected frequency of {:.1f} Hz violates the nyquist sampling rate theorem limit for the current sampling rate (sampling rate: {:.0f} Hz, nyquist limit: {:.1f} Hz)".format(cmd[1],self.sound_proc.tone_freq_hz,self.sound_proc.tone_freq_hz/2))
+							
 						print("Setting tone frequency to {} Hz".format(cmd[1]))
 						self.sound_proc.tone_freq_hz = cmd[1]
 				
 				elif 'set_tone_sam_rate' == cmd[0]:
 					if numerical_2nd(cmd):
 						cmd[1] = tryparse(cmd[1])
+						# make sure simpleaudio will be okay with the selection
+						if cmd[1] not in ALLOWED_AUDIO_SAM_RATES:
+							print("ERROR: selected frequency of {} is not one of the non-'weird' rates. Allowed sampling rates: {}".format(cmd[1],sorted(list(ALLOWED_AUDIO_SAM_RATES))))
+							
+							return False
+						
 						print("Setting tone generator sample rate to {} Hz".format(cmd[1]))
-						self.sound_proc.sam_rate_hz = cmd[1]
+						self.sound_proc.sam_rate_hz = int(cmd[1])
 				
 				elif 'set_avg_wordlen' == cmd[0]:
 					if numerical_2nd(cmd):
