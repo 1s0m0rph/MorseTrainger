@@ -8,7 +8,7 @@ from os.path import isfile
 DEFAULT_SAM_RATE_HZ = 8000
 EXEC_FREQ_HZ = 500
 DEFAULT_TONE_FREQ_HZ = 600
-DEFAULT_FADE_PCT = 7
+DEFAULT_FADE_PCT = 5
 ASSUME_AVG_WORDLEN_UNITS = 40 # how long do we assume the average word is, in units?
 DEFAULT_MAX_INTENSITY_PCT = 75
 DEFAULT_KEY_WPM = 20
@@ -430,6 +430,7 @@ Trainger terminal. Commands:
 	'/q' - quit
 	'/check_settings' - display values of all settings (except for allowed characters)
 	'/check_allowed_chars' - list all characters that the random generator will provide, and their codes
+	'/check_known_chars' - list all the characters that have known encodings
 	'/qr' - play a random morse sequence according to these settings and quiz on the result
 	'/set_key_wpm <number>' - set the keyer words per minute
 	'/set_farn_wpm <number>' - set the keyer farnsworth wpm
@@ -506,12 +507,23 @@ Trainger terminal. Commands:
 					            
 				elif 'check_allowed_chars' == cmd[0]:
 					print("Current allowed chars list:")
+					# sort the list first
+					allowed_chars = sorted(self.trainer.allowed_chars)
 					# format the list as we go
-					for ch in self.trainer.allowed_chars:
+					for ch in allowed_chars:
 						if ch not in MORSE_ENCS:
 							print("ERROR: {} not found in morse encodings dict".format(ch))
 						else:
 							print("{}\t-\t{}".format(ch,MORSE_ENCS[ch.upper()]))
+				
+				elif 'check_known_chars' == cmd[0]:
+					print("The following characters are known to the underlying encoder:")
+					# sort the list first
+					known_chars = sorted(list(MORSE_ENCS.keys()))
+					# format as we go
+					for ch in known_chars:
+						if ' ' != ch:
+							print("{}\t-\t{}".format(ch,MORSE_ENCS[ch]))
 				
 				elif 'set_key_wpm' == cmd[0]:
 					if numerical_2nd(cmd):
@@ -586,7 +598,7 @@ Trainger terminal. Commands:
 					# file exists, read the lines into memory and keep going (we'll process them on the next cycle)
 					with open(cmd[1],'r') as f:
 						self.file_lines = [x[:-1] for x in f.readlines()] # trim \ns
-					
+				
 				elif 'qr' == cmd[0]:
 					# begin quiz
 					self.trainer.quiz_one()
@@ -609,6 +621,9 @@ Trainger terminal. Commands:
 					response = '/' + response[2:]
 					
 				self.sound_proc.start_morse_playback(response)
+				# also print the word and its encoding
+				print("Input:\t", response)
+				print("Encoding:\t", text_to_morse(response))
 		
 		return False
 	

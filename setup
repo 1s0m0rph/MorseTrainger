@@ -1,3 +1,6 @@
 /help
-/set_key_wpm 20
+/set_key_wpm 15
+/set_farn_wpm 15
 /disallow_chars .,:?/'"()@+-=
+/disallow_chars 0123456789
+test
